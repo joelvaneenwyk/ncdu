@@ -460,6 +460,7 @@ pub fn main() void {
     var scan_dir: ?[]const u8 = null;
     var import_file: ?[:0]const u8 = null;
     var export_file: ?[:0]const u8 = null;
+    var quit_after_scan = false;
     {
         var arglist = std.process.argsAlloc(allocator) catch unreachable;
         defer std.process.argsFree(allocator, arglist);
@@ -479,6 +480,7 @@ pub fn main() void {
             else if (opt.is("-f") and import_file != null) ui.die("The -f flag can only be given once.\n", .{})
             else if (opt.is("-f")) import_file = allocator.dupeZ(u8, args.arg()) catch unreachable
             else if (opt.is("--ignore-config")) {}
+            else if (opt.is("--quit-after-scan")) quit_after_scan = true // undocumented feature to help with benchmarking scan/import
             else if (argConfig(&args, opt)) {}
             else ui.die("Unrecognized option '{s}'.\n", .{opt.val});
         }
@@ -515,7 +517,7 @@ pub fn main() void {
         config.imported = true;
     } else scan.scanRoot(scan_dir orelse ".", out_file)
            catch |e| ui.die("Error opening directory: {s}.\n", .{ui.errorString(e)});
-    if (out_file != null) return;
+    if (quit_after_scan or out_file != null) return;
 
     config.can_shell = config.can_shell orelse !config.imported;
     config.can_delete = config.can_delete orelse !config.imported;
