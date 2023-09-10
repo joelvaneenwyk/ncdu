@@ -254,7 +254,7 @@ static int arg_option(void) {
   else if(OPT("-L") || OPT("--follow-symlinks")) follow_symlinks = 1;
   else if(OPT("--no-follow-symlinks")) follow_symlinks = 0;
   else if(OPT("--exclude")) exclude_add(ARG);
-  else if(OPT("-X") || OPT("--exclude-form")) {
+  else if(OPT("-X") || OPT("--exclude-from")) {
     arg = ARG;
     if(exclude_addfile(arg)) die("Can't open %s: %s\n", arg, strerror(errno));
   } else if(OPT("--exclude-caches")) cachedir_tags = 1;
