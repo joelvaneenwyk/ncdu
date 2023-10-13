@@ -192,14 +192,6 @@ test "shorten" {
     try t("ą́ą́ą́ą́ą́ą́", 5, "ą́...̨́ą́"); // Combining marks, similarly bad.
 }
 
-// ncurses_refs.c
-extern fn ncdu_acs_ulcorner() c.chtype;
-extern fn ncdu_acs_llcorner() c.chtype;
-extern fn ncdu_acs_urcorner() c.chtype;
-extern fn ncdu_acs_lrcorner() c.chtype;
-extern fn ncdu_acs_hline()    c.chtype;
-extern fn ncdu_acs_vline()    c.chtype;
-
 const StyleAttr = struct { fg: i16, bg: i16, attr: u32 };
 const StyleDef = struct {
     name: []const u8,
@@ -535,20 +527,21 @@ pub const Box = struct {
         style(.default);
         if (width < 6 or height < 3) return s;
 
-        const ulcorner = ncdu_acs_ulcorner();
-        const llcorner = ncdu_acs_llcorner();
-        const urcorner = ncdu_acs_urcorner();
-        const lrcorner = ncdu_acs_lrcorner();
-        const acs_hline = ncdu_acs_hline();
-        const acs_vline = ncdu_acs_vline();
+        const acs_map = @extern(*[128]c.chtype, .{ .name = "acs_map" });
+        const ulcorner = acs_map['l'];
+        const llcorner = acs_map['m'];
+        const urcorner = acs_map['k'];
+        const lrcorner = acs_map['j'];
+        const acs_hline = acs_map['q'];
+        const acs_vline = acs_map['x'];
 
         var i: u32 = 0;
         while (i < height) : (i += 1) {
             s.move(i, 0);
-            addch(if (i == 0) ulcorner else if (i == height-1) llcorner else acs_hline);
-            hline(if (i == 0 or i == height-1) acs_vline else ' ', width-2);
+            addch(if (i == 0) ulcorner else if (i == height-1) llcorner else acs_vline);
+            hline(if (i == 0 or i == height-1) acs_hline else ' ', width-2);
             s.move(i, width-1);
-            addch(if (i == 0) urcorner else if (i == height-1) lrcorner else acs_hline);
+            addch(if (i == 0) urcorner else if (i == height-1) lrcorner else acs_vline);
         }
 
         s.move(0, 3);

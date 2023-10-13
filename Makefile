@@ -80,7 +80,7 @@ static-%.tar.gz:
 	@# Alternative approach, bypassing zig-build
 	cd static-$* && ${ZIG} build-exe -target $*\
 		-Iinst/include -Iinst/include/ncursesw -lc inst/lib/libncursesw.a\
-		--cache-dir zig-cache -static -fstrip -O ReleaseFast ../src/main.zig ../src/ncurses_refs.c
+		--cache-dir zig-cache -static -fstrip -O ReleaseFast ../src/main.zig
 	cd static-$* && mv main ncdu && tar -czf ../static-$*.tar.gz ncdu
 	rm -rf static-$*
 

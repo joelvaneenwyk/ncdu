@@ -51,5 +51,4 @@ pub fn build(b: *std.Build) void {
 pub fn linkNcurses(compile_step: *std.Build.CompileStep) void {
     compile_step.linkSystemLibrary("ncursesw");
     compile_step.linkLibC();
-    compile_step.addCSourceFile(.{ .file = .{ .path = "src/ncurses_refs.c" }, .flags = &.{} });
 }
