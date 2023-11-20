@@ -287,7 +287,7 @@ fn tryReadArgsFile(path: [:0]const u8) void {
             error.EndOfStream => if (line_fbs.getPos() catch unreachable == 0) break,
             else => |e| ui.die("Error reading from {s}: {s}\nRun with --ignore-config to skip reading config files.\n", .{ path, ui.errorString(e) }),
         };
-        var line_ = line_fbs.getWritten();
+        const line_ = line_fbs.getWritten();
 
         var line = std.mem.trim(u8, line_, &std.ascii.whitespace);
         if (line.len == 0 or line[0] == '#') continue;
@@ -447,11 +447,11 @@ pub fn main() void {
         tryReadArgsFile("/etc/ncdu.conf");
 
         if (std.os.getenvZ("XDG_CONFIG_HOME")) |p| {
-            var path = std.fs.path.joinZ(allocator, &.{p, "ncdu", "config"}) catch unreachable;
+            const path = std.fs.path.joinZ(allocator, &.{p, "ncdu", "config"}) catch unreachable;
             defer allocator.free(path);
             tryReadArgsFile(path);
         } else if (std.os.getenvZ("HOME")) |p| {
-            var path = std.fs.path.joinZ(allocator, &.{p, ".config", "ncdu", "config"}) catch unreachable;
+            const path = std.fs.path.joinZ(allocator, &.{p, ".config", "ncdu", "config"}) catch unreachable;
             defer allocator.free(path);
             tryReadArgsFile(path);
         }
@@ -462,7 +462,7 @@ pub fn main() void {
     var export_file: ?[:0]const u8 = null;
     var quit_after_scan = false;
     {
-        var arglist = std.process.argsAlloc(allocator) catch unreachable;
+        const arglist = std.process.argsAlloc(allocator) catch unreachable;
         defer std.process.argsFree(allocator, arglist);
         var args = Args.init(arglist);
         _ = args.next(); // program name
@@ -506,7 +506,7 @@ pub fn main() void {
     event_delay_timer = std.time.Timer.start() catch unreachable;
     defer ui.deinit();
 
-    var out_file = if (export_file) |f| (
+    const out_file = if (export_file) |f| (
         if (std.mem.eql(u8, f, "-")) stdout
         else std.fs.cwd().createFileZ(f, .{})
              catch |e| ui.die("Error opening export file: {s}.\n", .{ui.errorString(e)})
@@ -573,7 +573,7 @@ pub fn handleEvent(block: bool, force_draw: bool) void {
 
     var firstblock = block;
     while (true) {
-        var ch = ui.getch(firstblock);
+        const ch = ui.getch(firstblock);
         if (ch == 0) return;
         if (ch == -1) return handleEvent(firstblock, true);
         switch (state) {

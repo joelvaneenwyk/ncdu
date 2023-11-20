@@ -342,9 +342,9 @@ pub fn init() void {
     if (inited) return;
     clearScr();
     if (main.config.nc_tty) {
-        var tty = c.fopen("/dev/tty", "r+");
+        const tty = c.fopen("/dev/tty", "r+");
         if (tty == null) die("Error opening /dev/tty: {s}.\n", .{ c.strerror(@intFromEnum(std.c.getErrno(-1))) });
-        var term = c.newterm(null, tty, tty);
+        const term = c.newterm(null, tty, tty);
         if (term == null) die("Error initializing ncurses.\n", .{});
         _ = c.set_term(term);
     } else {

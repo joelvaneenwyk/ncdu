@@ -319,7 +319,7 @@ pub const devices = struct {
     var lookup = std.AutoHashMap(u64, DevId).init(main.allocator);
 
     pub fn getId(dev: u64) DevId {
-        var d = lookup.getOrPut(dev) catch unreachable;
+        const d = lookup.getOrPut(dev) catch unreachable;
         if (!d.found_existing) {
             d.value_ptr.* = @as(DevId, @intCast(list.items.len));
             list.append(dev) catch unreachable;
@@ -400,7 +400,7 @@ pub const inodes = struct {
                 nlink += 1;
                 var parent: ?*Dir = it.parent;
                 while (parent) |p| : (parent = p.parent) {
-                    var de = dirs.getOrPut(p) catch unreachable;
+                    const de = dirs.getOrPut(p) catch unreachable;
                     if (de.found_existing) de.value_ptr.* += 1
                     else de.value_ptr.* = 1;
                 }

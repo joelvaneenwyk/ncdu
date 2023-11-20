@@ -349,8 +349,8 @@ const info = struct {
     var links_idx: usize = 0;
 
     fn lt(_: void, a: *model.Link, b: *model.Link) bool {
-        var pa = a.path(false);
-        var pb = b.path(false);
+        const pa = a.path(false);
+        const pb = b.path(false);
         defer main.allocator.free(pa);
         defer main.allocator.free(pb);
         return std.mem.lessThan(u8, pa, pb);

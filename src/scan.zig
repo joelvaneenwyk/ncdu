@@ -293,7 +293,7 @@ const Context = struct {
         wr.print("{d}", .{std.time.timestamp()}) catch |e| writeErr(e);
         wr.writeByte('}') catch |e| writeErr(e);
 
-        var self = main.allocator.create(Self) catch unreachable;
+        const self = main.allocator.create(Self) catch unreachable;
         self.* = .{ .wr = buf };
         return self;
     }
@@ -555,7 +555,7 @@ pub fn setupRefresh(parent: *model.Dir) void {
 // To be called after setupRefresh() (or from scanRoot())
 pub fn scan() void {
     defer active_context.deinit();
-    var dir_ = std.fs.cwd().openDirZ(active_context.pathZ(), .{}, true) catch |e| {
+    const dir_ = std.fs.cwd().openDirZ(active_context.pathZ(), .{}, true) catch |e| {
         active_context.last_error = main.allocator.dupeZ(u8, active_context.path.items) catch unreachable;
         active_context.fatal_error = e;
         while (main.state == .refresh or main.state == .scan)
