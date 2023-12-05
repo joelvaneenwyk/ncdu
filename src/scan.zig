@@ -176,7 +176,7 @@ const ScanDir = struct {
         };
         var f = e.file().?;
         switch (t) {
-            .err => e.setErr(self.dir),
+            .err => f.pack.err = true,
             .other_fs => f.pack.other_fs = true,
             .kernfs => f.pack.kernfs = true,
             .excluded => f.pack.excluded = true,
@@ -231,16 +231,17 @@ const ScanDir = struct {
     }
 
     fn final(self: *Self) void {
-        if (self.entries.count() == 0) // optimization for the common case
-            return;
-        var it = &self.dir.sub;
-        while (it.*) |e| {
-            if (self.entries.contains(e)) {
-                e.delStatsRec(self.dir);
-                it.* = e.next;
-            } else
-                it = &e.next;
+        if (self.entries.count() > 0) {
+            var it = &self.dir.sub;
+            while (it.*) |e| {
+                if (self.entries.contains(e)) {
+                    e.delStatsRec(self.dir);
+                    it.* = e.next;
+                } else
+                    it = &e.next;
+            }
         }
+        self.dir.updateSubErr();
     }
 
     fn deinit(self: *Self) void {
@@ -261,6 +262,7 @@ const ScanDir = struct {
 const Context = struct {
     // When scanning to RAM
     parents: ?std.ArrayList(ScanDir) = null,
+    refreshing: ?*model.Dir = null,
     // When scanning to a file
     wr: ?*Writer = null,
 
@@ -300,7 +302,10 @@ const Context = struct {
 
     fn initMem(dir: ?*model.Dir) *Self {
         var self = main.allocator.create(Self) catch unreachable;
-        self.* = .{ .parents = std.ArrayList(ScanDir).init(main.allocator) };
+        self.* = .{
+            .parents = std.ArrayList(ScanDir).init(main.allocator),
+            .refreshing = dir,
+        };
         if (dir) |d| self.parents.?.append(ScanDir.init(d)) catch unreachable;
         return self;
     }
@@ -311,6 +316,8 @@ const Context = struct {
             defer counting_hardlinks = false;
             main.handleEvent(false, true);
             model.inodes.addAllStats();
+            var p = self.refreshing;
+            while (p) |d| : (p = d.parent) d.updateSubErr();
         }
         if (self.wr) |wr| {
             wr.writer().writeByte(']') catch |e| writeErr(e);
@@ -353,7 +360,7 @@ const Context = struct {
     // Set a flag to indicate that there was an error listing file entries in the current directory.
     // (Such errors are silently ignored when exporting to a file, as the directory metadata has already been written)
     fn setDirlistError(self: *Self) void {
-        if (self.parents) |*p| p.items[p.items.len-1].dir.entry.setErr(p.items[p.items.len-1].dir);
+        if (self.parents) |*p| p.items[p.items.len-1].dir.pack.err = true;
     }
 
     const Special = enum { err, other_fs, kernfs, excluded };

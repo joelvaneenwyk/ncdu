@@ -109,16 +109,11 @@ pub const Entry = extern struct {
         };
     }
 
-    // Set the 'err' flag on Dirs and Files, propagating 'suberr' to parents.
-    pub fn setErr(self: *Self, parent: *Dir) void {
-        if (self.dir()) |d| d.pack.err = true
-        else if (self.file()) |f| f.pack.err = true
-        else unreachable;
-        var it: ?*Dir = if (&parent.entry == self) parent.parent else parent;
-        while (it) |p| : (it = p.parent) {
-            if (p.pack.suberr) break;
-            p.pack.suberr = true;
-        }
+    fn hasErr(self: *Self) bool {
+        return
+            if (self.file()) |f| f.pack.err
+            else if (self.dir()) |d| d.pack.err or d.pack.suberr
+            else false;
     }
 
     pub fn addStats(self: *Entry, parent: *Dir, nlink: u31) void {
@@ -263,6 +258,19 @@ pub const Dir = extern struct {
             out.appendSlice(components.items[i]) catch unreachable;
             if (i == 0) break;
             i -= 1;
+        }
+    }
+
+    // Only updates the suberr of this Dir, assumes child dirs have already
+    // been updated and does not propagate to parents.
+    pub fn updateSubErr(self: *@This()) void {
+        self.pack.suberr = false;
+        var sub = self.sub;
+        while (sub) |e| : (sub = e.next) {
+            if (e.hasErr()) {
+                self.pack.suberr = true;
+                break;
+            }
         }
     }
 };
