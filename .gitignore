@@ -16,7 +16,6 @@ missing
 *.o
 stamp-h1
 ncdu
-ncdu.1
 *~
 *.swp
 static/*

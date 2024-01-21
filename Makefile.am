@@ -37,12 +37,7 @@ noinst_HEADERS=\
 
 
 man_MANS=ncdu.1
-EXTRA_DIST=ncdu.1 doc/ncdu.pod
-
-# Don't "clean" ncdu.1, it should be in the tarball so that pod2man isn't a
-# build dependency for those who use the tarball.
-ncdu.1: $(srcdir)/doc/ncdu.pod
-	pod2man --center "ncdu manual" --release "@PACKAGE@-@VERSION@" "$(srcdir)/doc/ncdu.pod" >ncdu.1
+EXTRA_DIST=ncdu.1
 
 # This target exists more for documentation purposes than actual use; some
 # dependencies have minor ncdu-specific changes.
