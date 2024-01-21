@@ -14,7 +14,7 @@ ZIG_FLAGS ?= -Doptimize=ReleaseFast
 NCDU_VERSION=$(shell grep 'program_version = "' src/main.zig | sed -e 's/^.*"\(.\+\)".*$$/\1/')
 
 .PHONY: build
-build: release doc
+build: release
 
 release:
 	$(ZIG) build ${ZIG_FLAGS}
@@ -25,21 +25,13 @@ debug:
 clean:
 	rm -rf zig-cache zig-out
 
-distclean: clean
-	rm -f ncdu.1
-
-doc: ncdu.1
-
-ncdu.1: ncdu.pod src/main.zig
-	pod2man --center "ncdu manual" --release "ncdu-${NCDU_VERSION}" ncdu.pod >ncdu.1
-
 install: install-bin install-doc
 
 install-bin: release
 	mkdir -p ${BINDIR}
 	install -m0755 zig-out/bin/ncdu ${BINDIR}/
 
-install-doc: doc
+install-doc:
 	mkdir -p ${MANDIR}
 	install -m0644 ncdu.1 ${MANDIR}/
 
@@ -52,10 +44,10 @@ uninstall-bin:
 uninstall-doc:
 	rm -f ${MANDIR}/ncdu.1
 
-dist: doc
+dist:
 	rm -f ncdu-${NCDU_VERSION}.tar.gz
 	mkdir ncdu-${NCDU_VERSION}
-	for f in ncdu.1 `git ls-files | grep -v ^\.gitignore`; do mkdir -p ncdu-${NCDU_VERSION}/`dirname $$f`; ln -s "`pwd`/$$f" ncdu-${NCDU_VERSION}/$$f; done
+	for f in `git ls-files | grep -v ^\.gitignore`; do mkdir -p ncdu-${NCDU_VERSION}/`dirname $$f`; ln -s "`pwd`/$$f" ncdu-${NCDU_VERSION}/$$f; done
 	tar -cophzf ncdu-${NCDU_VERSION}.tar.gz --sort=name ncdu-${NCDU_VERSION}
 	rm -rf ncdu-${NCDU_VERSION}
 
