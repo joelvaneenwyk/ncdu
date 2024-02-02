@@ -20,3 +20,4 @@ ncdu
 *.swp
 static/*
 !static/build.sh
+zig-cache/
