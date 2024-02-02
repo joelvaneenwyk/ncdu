@@ -1,7 +1,13 @@
 {
+    "files.associations": {
+        "COPYING": "plaintext",
+        "README": "markdown",
+        "ChangeLog": "markdown"
+    },
     "cSpell.words": [
         "autoreconf",
         "cmds",
+        "libncurses",
         "ncdu",
         "Yoran"
     ]
