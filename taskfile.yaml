@@ -10,9 +10,15 @@ version: "3"
 tasks:
   default:
     cmds:
-      - ./configure --prefix=/usr
-      - make
-      - make install
+      - cmd: autoreconf -i
+        platforms: [linux, darwin]
+      - cmd: ./configure --prefix=/usr
+        platforms: [linux, darwin]
+      - cmd: make
+        platforms: [linux, darwin]
+      - cmd: make install
+        ignore_error: true
+        platforms: [linux, darwin]
     silent: false
 
   install:
@@ -24,3 +30,4 @@ tasks:
             libncurses6 libncurses-dev \
             autoconf automake libtool build-essential pkg-config \
           && sudo apt-get autoremove
+        platforms: [linux]
