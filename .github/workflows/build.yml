@@ -8,25 +8,24 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu, macos]
+
+    runs-on: ${{ matrix.os }}-latest
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Dependencies
-        if: matrix.os == 'ubuntu-latest'
-        run: |
+        if: matrix.os == 'ubuntu'
+        run: >
           sudo apt-get update
-          sudo apt-get upgrade -y --no-install-recommends
-          sudo apt-get install -y --no-install-recommends \
-            libncurses6 libncurses-dev \
-            autoconf automake libtool build-essential pkg-config
-          sudo apt-get autoremove
+          && sudo apt-get install -y --no-install-recommends
+              libncurses6 libncurses-dev
+              autoconf automake libtool build-essential pkg-config
+          && sudo apt-get autoremove
 
       - name: Autoconf
         run: autoreconf -i
@@ -46,6 +45,6 @@ jobs:
       - name: Upload Binaries 🚀
         uses: actions/upload-artifact@v4
         with:
-          name: ncdu
+          name: ncdu-${matrix.os}
           path: |
             bin
