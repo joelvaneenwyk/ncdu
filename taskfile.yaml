@@ -1,0 +1,33 @@
+# https://taskfile.dev
+#
+# Install with:
+#
+#    sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+#
+
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - cmd: autoreconf -i
+        platforms: [linux, darwin]
+      - cmd: ./configure --prefix=/usr
+        platforms: [linux, darwin]
+      - cmd: make
+        platforms: [linux, darwin]
+      - cmd: make install
+        ignore_error: true
+        platforms: [linux, darwin]
+    silent: false
+
+  install:
+    cmds:
+      - cmd: |-
+          sudo apt-get update \
+          && sudo apt-get upgrade -y --no-install-recommends \
+          && sudo apt-get install -y --no-install-recommends \
+            libncurses6 libncurses-dev \
+            autoconf automake libtool build-essential pkg-config \
+          && sudo apt-get autoremove
+        platforms: [linux]
