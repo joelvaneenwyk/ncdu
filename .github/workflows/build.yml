@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Install Dependencies 'Ubuntu'
         if: matrix.os == 'ubuntu'
         run: >
           sudo apt-get update
@@ -26,6 +26,11 @@ jobs:
               libncurses6 libncurses-dev
               autoconf automake libtool build-essential pkg-config
           && sudo apt-get autoremove
+
+      - name: Install Dependencies 'macOS'
+        if: matrix.os == 'macos'
+        run: >
+          brew install automake
 
       - name: Autoconf
         run: autoreconf -i
