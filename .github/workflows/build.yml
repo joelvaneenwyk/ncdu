@@ -34,6 +34,7 @@ jobs:
             autotools
             base-devel
             gcc
+            ncurses-devel
 
       - uses: actions/checkout@v4
 
