@@ -32,6 +32,8 @@ jobs:
             curl
             git
             autotools
+            base-devel
+            gcc
 
       - uses: actions/checkout@v4
 
