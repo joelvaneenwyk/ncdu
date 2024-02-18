@@ -20,16 +20,16 @@ jobs:
 
       - name: Install Dependencies 'Ubuntu'
         if: matrix.os == 'ubuntu'
-        run: >
+        run: |
           sudo apt-get update
-          && sudo apt-get install -y --no-install-recommends
-              libncurses6 libncurses-dev
-              autoconf automake libtool build-essential pkg-config
-          && sudo apt-get autoremove
+          sudo apt-get install -y --no-install-recommends \
+            libncurses6 libncurses-dev \
+            autoconf automake libtool build-essential pkg-config
+          sudo apt-get autoremove
 
       - name: Install Dependencies 'macOS'
         if: matrix.os == 'macos'
-        run: >
+        run: |
           brew install automake
 
       - name: Autoconf
