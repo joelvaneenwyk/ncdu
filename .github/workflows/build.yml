@@ -1,0 +1,75 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, macos]
+        shell: [bash]
+        include:
+          - os: windows
+            shell: msys2 {0}
+
+    runs-on: ${{ matrix.os }}-latest
+
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+
+    steps:
+      - uses: msys2/setup-msys2@v2
+        if: matrix.os == 'windows'
+        with:
+          update: true
+          install: >-
+            curl
+            git
+            autotools
+            base-devel
+            gcc
+            ncurses-devel
+
+      - uses: actions/checkout@v4
+
+      - name: Install Dependencies 'Ubuntu'
+        if: matrix.os == 'ubuntu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libncurses6 libncurses-dev \
+            autoconf automake libtool build-essential pkg-config
+          sudo apt-get autoremove
+
+      - name: Install Dependencies 'macOS'
+        if: matrix.os == 'macos'
+        run: |
+          brew install automake
+
+      - name: Autoconf
+        run: autoreconf -i
+
+      - name: Configure
+        run: ./configure --prefix="${GITHUB_WORKSPACE}/bin"
+
+      - name: Build ⚙️
+        run: make
+
+      - name: Build Distribution
+        run: make dist
+
+      - name: Install
+        run: make install
+
+      - name: Upload Binaries 🚀
+        uses: actions/upload-artifact@v4
+        with:
+          name: ncdu-${{matrix.os}}
+          path: |
+            bin
