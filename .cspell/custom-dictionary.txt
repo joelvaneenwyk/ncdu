@@ -1,0 +1,6 @@
+# Custom Dictionary Words
+autoreconf
+devel
+libncurses
+msys
+ncdu
