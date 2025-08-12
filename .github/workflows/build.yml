@@ -36,7 +36,7 @@ jobs:
             gcc
             ncurses-devel
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Dependencies 'Ubuntu'
         if: matrix.os == 'ubuntu'
