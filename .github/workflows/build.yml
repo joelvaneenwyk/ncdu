@@ -68,7 +68,7 @@ jobs:
         run: make install
 
       - name: Upload Binaries 🚀
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ncdu-${{matrix.os}}
           path: |
